@@ -21,8 +21,8 @@ def create_client_hello_tls13(url, key):
 
     # TLS 1.3 cipher suites
     cipher_suites = (
-        b'\x13\x01'  # TLS_AES_128_GCM_SHA256
-        + b'\x13\x02'  # TLS_AES_256_GCM_SHA384
+        b'\x13\x02'  # TLS_AES_128_GCM_SHA256
+        # + b'\x13\x01'  # TLS_AES_256_GCM_SHA384
         + b'\x13\x03'  # TLS_CHACHA20_POLY1305_SHA256
     )
     cipher_suites_length = int_to_bytes(len(cipher_suites), 2)
@@ -67,9 +67,7 @@ def create_client_hello_tls13(url, key):
         + b'\x00\x20'  # Key share length (32 bytes)
         + key  # Random key share (32 bytes)
     )
-    ba = "00 00 00 18 00 16 00 00 13 65 78 61 6d 70 6c 65 2e 75 6c 66 68 65 69 6d 2e 6e 65 74"
-    hex_strings = ba.split()
-    hex_numbers = [int(x, 16) for x in hex_strings]
+  
     test = url.encode()
     # Key Share Extension
     server_name = (
