@@ -22,6 +22,7 @@ class TLS13BodyParser:
     def parse(self):
         certificates = {}
         certificates['cipherchange'] = self.read_bytes(6).hex()
+        print(certificates['cipherchange'])
         certificates['parse_extensions'] = self.parse_next()
         # print(certificates)
         certificates['parse_certs'] = self.parse_next()

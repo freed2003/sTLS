@@ -46,6 +46,7 @@ class TLS13Session:
     
         parser = TLS13BodyParser(self.socket, server_handshake_key, server_handshake_iv)
         parsed = parser.parse()
+        print(parsed)
         acc = parser.get_acc()
         # print(acc.hex())
         total = hello_pre + acc
@@ -58,8 +59,9 @@ class TLS13Session:
         enc, tag = parser.AES_encrypt(cf, client_handshake_key, client_handshake_iv, header)
         final_cf = header + enc + tag
         self.socket.sendall(final_cf)
-        print(self.parse_session_ticket(self.recvnext()))
-        print(self.parse_session_ticket(self.recvnext()))   
+        # print(self.recvnext())
+        # print(self.parse_session_ticket(self.recvnext()))
+        # print(self.parse_session_ticket(self.recvnext()))   
     def send(self, data):
         if self.wrapper is None:
             self.handshake()

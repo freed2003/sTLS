@@ -21,9 +21,7 @@ def create_client_hello_tls13(url, key):
 
     # TLS 1.3 cipher suites
     cipher_suites = (
-        b'\x13\x02'  # TLS_AES_128_GCM_SHA256
-        # + b'\x13\x01'  # TLS_AES_256_GCM_SHA384
-        + b'\x13\x03'  # TLS_CHACHA20_POLY1305_SHA256
+        b'\x13\x01'
     )
     cipher_suites_length = int_to_bytes(len(cipher_suites), 2)
 
