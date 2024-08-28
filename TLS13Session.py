@@ -43,7 +43,7 @@ class TLS13Session:
 
         hello_pre = ch[5:] + sh[5:]
         client_secret, server_secret, client_handshake_key, client_handshake_iv, server_handshake_key, server_handshake_iv = get_client_key_and_iv(shared_key, hello_pre)
-    
+
         parser = TLS13BodyParser(self.socket, server_handshake_key, server_handshake_iv)
         parsed = parser.parse()
         print(parsed)
@@ -54,14 +54,13 @@ class TLS13Session:
         client_application_key, client_application_iv, server_application_key, server_application_iv = get_application_key_and_iv(shared_key, total)
         self.wrapper = TLS13Wrapper(client_application_key, client_application_iv, server_application_key, server_application_iv)
         cf = client_finished(total, client_secret)
-        header = b"\x17\x03\x03\x00\x45"
+        header = b"\x17\x03\x03\x00\x35"
         # print(cf.hex())
         enc, tag = parser.AES_encrypt(cf, client_handshake_key, client_handshake_iv, header)
         final_cf = header + enc + tag
         self.socket.sendall(final_cf)
-        # print(self.recvnext())
-        # print(self.parse_session_ticket(self.recvnext()))
-        # print(self.parse_session_ticket(self.recvnext()))   
+        print(self.parse_session_ticket(self.recvnext()))
+        print(self.parse_session_ticket(self.recvnext()))   
     def send(self, data):
         if self.wrapper is None:
             self.handshake()
@@ -98,6 +97,6 @@ if __name__ == "__main__":
     conn = TLS13Session("amazon.com", 443, sock)
     # conn.handshake()
     conn.send(b"GET / HTTP/1.1\r\nHost: amazon.com\r\nConnection: close\r\n\r\n")
-    print(conn.recvnext().hex())
+    print(conn.recvnext().decode())
     # print(conn.recvnext().hex())
     # print(conn.recvnext().hex())

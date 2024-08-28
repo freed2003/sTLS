@@ -21,7 +21,7 @@ def hkdf_expand_label(secret, label, ctx, length):
     return hkdf.hkdf_expand(secret, hkdf_label, length, sha256)
 
 def get_client_key_and_iv(shared_secret, hello_pre):
-    early_secret = hkdf_extract(b'\x00', None)
+    early_secret = hkdf_extract(b'\x00', b'\x00' * 32)
 
     hasher = sha256()
     hasher.update(b'')
@@ -47,7 +47,7 @@ def get_client_key_and_iv(shared_secret, hello_pre):
     return (client_secret, server_secret, client_handshake_key, client_handshake_iv, server_handshake_key, server_handshake_iv)
 
 def get_application_key_and_iv(shared_secret, handshake_pre):
-    early_secret = hkdf_extract(b'\x00', None)
+    early_secret = hkdf_extract(b'\x00', b'\x00' * 32)
 
     hasher = sha256()
     hasher.update(b'')
@@ -77,12 +77,12 @@ def get_application_key_and_iv(shared_secret, handshake_pre):
     return (client_application_key, client_application_iv, server_application_key, server_application_iv)
 
 def client_finished(data, secret):
-    header = b"\x14\x00\x00\x30"
-    finished_key = hkdf_expand_label(secret, b'finished', b'', 48)
-    hasher = sha384()
+    header = b"\x14\x00\x00\x20"
+    finished_key = hkdf_expand_label(secret, b'finished', b'', 32)
+    hasher = sha256()
     hasher.update(data)
     finished_hash = hasher.digest()
-    verify_data = hmac.new(finished_key, finished_hash, sha384).digest()
+    verify_data = hmac.new(finished_key, finished_hash, sha256).digest()
     return(header + verify_data + b"\x16")
 
 if __name__ == "__main__":
