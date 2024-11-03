@@ -1,5 +1,5 @@
 # sTLS
-Toy implementaiton of TLS v1.3.
+Toy implementation of TLS v1.3.
 
 ## Installing Dependencies
 This implementation requires the `cryptography` and `pycryptodome` modules. To install, run the following in a virtual environment.
