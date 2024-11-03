@@ -1,94 +1,87 @@
 import socket
 import os
 
+
 def int_to_bytes(value, length):
-    return value.to_bytes(length, byteorder='big')
+    return value.to_bytes(length, byteorder="big")
+
 
 def create_client_hello_tls13(url, key):
     # TLS Record Header
-    content_type = b'\x16'  # Handshake
-    version = b'\x03\x01'   # Legacy version used in the record layer for TLS 1.3 (0x0301)
+    content_type = b"\x16"  # Handshake
+    version = (
+        b"\x03\x01"  # Legacy version used in the record layer for TLS 1.3 (0x0301)
+    )
 
     # Handshake Header
-    handshake_type = b'\x01'  # ClientHello
+    handshake_type = b"\x01"  # ClientHello
 
     # ClientHello Body
-    client_version = b'\x03\x03'  # TLS 1.2 (used in ClientHello for TLS 1.3)
+    client_version = b"\x03\x03"  # TLS 1.2 (used in ClientHello for TLS 1.3)
     random_bytes = os.urandom(32)  # 32 bytes of random data
 
     session_id = os.urandom(32)  # No session ID
     session_id_length = int_to_bytes(len(session_id), 1)
 
     # TLS 1.3 cipher suites
-    cipher_suites = (
-        b'\x13\x01'
-    )
+    cipher_suites = b"\x13\x01"
     cipher_suites_length = int_to_bytes(len(cipher_suites), 2)
 
-    compression_methods = b'\x01\x00'  # No compression
+    compression_methods = b"\x01\x00"  # No compression
     compression_methods_length = int_to_bytes(len(compression_methods), 1)
 
     # Supported Versions Extension
     supported_versions = (
-        b'\x00\x2b'  # Extension type (Supported Versions)
-        + b'\x00\x03'  # Length of extension data
-        + b'\x02'  # Length of versions list
-        + b'\x03\x04'  # TLS 1.3 (0x0304)
+        b"\x00\x2b"  # Extension type (Supported Versions)
+        + b"\x00\x03"  # Length of extension data
+        + b"\x02"  # Length of versions list
+        + b"\x03\x04"  # TLS 1.3 (0x0304)
     )
 
     # Supported Groups Extension
     supported_groups = (
-        b'\x00\x0a'  # Extension type (Supported Groups)
-        + b'\x00\x08'  # Length of extension data
-        + b'\x00\x06'
-        + b'\x00\x1d'  # x25519
-        + b'\x00\x17'  # secp256r1
-        + b'\x00\x18'  # secp384r1
+        b"\x00\x0a"  # Extension type (Supported Groups)
+        + b"\x00\x08"  # Length of extension data
+        + b"\x00\x06"
+        + b"\x00\x1d"  # x25519
+        + b"\x00\x17"  # secp256r1
+        + b"\x00\x18"  # secp384r1
     )
 
     # Signature Algorithms Extension
     signature_algorithms = (
-        b'\x00\x0d'  # Extension type (Signature Algorithms)
-        + b'\x00\x08'  # Length of extension data
-        + b'\x00\x06'
-        + b'\x04\x03'  # ecdsa_secp256r1_sha256
-        + b'\x05\x03'  # rsa_pss_rsae_sha256
-        + b'\x08\x04'  # rsa_pss_pss_sha256
+        b"\x00\x0d"  # Extension type (Signature Algorithms)
+        + b"\x00\x08"  # Length of extension data
+        + b"\x00\x06"
+        + b"\x04\x03"  # ecdsa_secp256r1_sha256
+        + b"\x05\x03"  # rsa_pss_rsae_sha256
+        + b"\x08\x04"  # rsa_pss_pss_sha256
     )
 
     # Key Share Extension
     key_share = (
-        b'\x00\x33'  # Extension type (Key Share)
-        + b'\x00\x26'  # Length of extension data
-        + b'\x00\x24'
-        + b'\x00\x1d'  # Key share group (x25519)
-        + b'\x00\x20'  # Key share length (32 bytes)
+        b"\x00\x33"  # Extension type (Key Share)
+        + b"\x00\x26"  # Length of extension data
+        + b"\x00\x24"
+        + b"\x00\x1d"  # Key share group (x25519)
+        + b"\x00\x20"  # Key share length (32 bytes)
         + key  # Random key share (32 bytes)
     )
-  
+
     test = url.encode()
     # Key Share Extension
     server_name = (
-        b'\x00\x00'  # Extension type (Key Share)
+        b"\x00\x00"  # Extension type (Key Share)
         + int_to_bytes(len(test) + 5, 2)
         + int_to_bytes(len(test) + 3, 2)
-        + b'\x00'
+        + b"\x00"
         + int_to_bytes(len(test), 2)
         + test
     )
 
-    session_ticket = (
-        b'\x00\x23'
-        + b'\x00\x00'
-    )
+    session_ticket = b"\x00\x23" + b"\x00\x00"
 
-    ec_point_formats = (
-        b'\x00\x0b'
-        + b'\x00\x04'
-        + b'\x03'
-        + b'\x00'
-        + b'\x01\x02'
-    )
+    ec_point_formats = b"\x00\x0b" + b"\x00\x04" + b"\x03" + b"\x00" + b"\x01\x02"
     # server_name = bytes(hex_numbers)
     # # Supported Signature Algorithms Certificate Extension
     # signature_algorithms_cert = (
@@ -158,8 +151,9 @@ def create_client_hello_tls13(url, key):
 
     return tls_record
 
+
 def send_client_hello(host, port):
-    client_hello_message = create_client_hello_tls13('amazon.com')
+    client_hello_message = create_client_hello_tls13("amazon.com")
 
     with socket.create_connection((host, port)) as sock:
         sock.sendall(client_hello_message)
@@ -169,6 +163,7 @@ def send_client_hello(host, port):
         # Optionally, receive and print the server's response
         response = sock.recv(8092)
         print("Received response:", response.hex())
+
 
 if __name__ == "__main__":
     send_client_hello("amazon.com", 443)
